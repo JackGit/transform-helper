@@ -29,11 +29,9 @@ const transformHelper = new TransformHelper({
   }
 })
 
-transformHelper.wrap(el, {
-  rotate: true,
-  scale: true, // resize
-  move: true
-})
+transformHelper.wrap(el, options)
+transformHelper.link(el, options)
+transformHelper.cover(el, options)
 
 transformHelper.on('', () => {})
 
