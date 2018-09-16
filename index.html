@@ -200,5 +200,40 @@
     
       <div class="th-box"></div>
     </div>
+    <script>
+
+      const helper = document.querySelector('.th-helper')
+      
+      let started
+      let startX, startY
+      let deltaX, deltaY
+      let transformX = 0, transformY = 0
+
+      window.addEventListener('mousedown', e => {
+        started = true
+        startX = e.clientX
+        startY = e.clientY
+      })
+
+      window.addEventListener('mousemove', e => {
+        if (!started) {
+          return
+        }
+
+        e.stopPropagation()
+
+        deltaX = e.clientX - startX
+        deltaY = e.clientY - startY
+        console.log(deltaX, deltaY)
+
+        helper.style.transform = `translateX(${transformX + deltaX}px) translateY(${transformY + deltaY}px)`
+      })
+
+      window.addEventListener('mouseup', e => {
+        started = false
+        transformX += deltaX
+        transformY += deltaY
+      })
+    </script>
   </body>
 </html>
