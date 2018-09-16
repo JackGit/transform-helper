@@ -16,7 +16,7 @@ class TransformHelper extends EventEmitter {
 
   }
 
-  _dettachEvents () {
+  _detachEvents () {
 
   }
 
