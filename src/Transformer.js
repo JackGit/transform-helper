@@ -26,8 +26,11 @@ class Transfomer {
     this.transformation = getTransformationFromElement(el)
   }
 
-  transform () {
-    this.transformation = normalizeTransformation(this.transformation)
+  transform (transformation = {}) {
+    this.transformation = normalizeTransformation({
+      ...this.transformation,
+      ...transformation
+    })
     const { x, y, rotate, scaleX, scaleY } = this.transformation
     this.el.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`
   }
