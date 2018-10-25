@@ -14,11 +14,20 @@ const getTransformationFromElement = el => {
   return {
     x: 0,
     y: 0,
+    // width: 0,
+    // height: 0,
     rotate: 0,
     scaleX: 1,
     scaleY: 1
   }
 }
+
+export const setTransformStyle = (el, transformation) => {
+  const { x, y, rotate, scaleX, scaleY } = transformation
+  el.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`
+}
+
+// need to distinguish scale and resize
 
 class Transfomer {
   constructor (el) {
@@ -31,8 +40,7 @@ class Transfomer {
       ...this.transformation,
       ...transformation
     })
-    const { x, y, rotate, scaleX, scaleY } = this.transformation
-    this.el.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`
+    setTransformStyle(this.el, this.transformation)
   }
 
   translate (x, y) {
