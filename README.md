@@ -30,6 +30,9 @@ const transformHelper = new TransformHelper({
   }
 })
 
+transformHelper.enable(['translate', 'rotate', 'scale', 'resize'])
+// each helper has its own helper UI (and event handling), and a transform method
+
 transformHelper.wrap(el, options)
 transformHelper.link(el, options)
 transformHelper.cover(el, options)
