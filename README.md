@@ -20,6 +20,7 @@
 </div>
 */
 
+```js
 const transformHelper = new TransformHelper({
   classPrefix: 'th-helper',
   renderer: {
@@ -65,3 +66,4 @@ transformHelper.moveBy()
 transformHelper.enableRotate()
 transformHelper.disableRotate()
 transformHelper.rotateEnabled
+```
