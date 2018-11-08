@@ -26,10 +26,6 @@ class BaseHelper extends EventEmitter {
     // render UI to this.helperManager.rootEl
   }
 
-  renderInfo () {
-    // render how help info would be display: rotation deg, move x & y, scale index, etc
-  }
-
 }
 
 export default BaseHelper
