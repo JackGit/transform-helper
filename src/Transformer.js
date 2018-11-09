@@ -10,6 +10,8 @@ const normalizeTransformation = ({
 })
 
 // TODO
+// { top, left, width, height, rotation, rotatePivot = { x: .5, y: .5 } }
+// { translateX, translateY, scaleX, scaleY, rotate, transformOrigin }
 const getTransformationFromElement = el => {
   return {
     x: 0,
