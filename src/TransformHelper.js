@@ -43,7 +43,8 @@ class TransformHelper {
 
   _init () {
     this._createRootElement(this.options)
-    const moveHelper = new MoveHelper(this)
+    new MoveHelper(this)
+    new RotateHelper(this)
   }
 
   _attachEvents () {
