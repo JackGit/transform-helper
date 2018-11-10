@@ -1,63 +1,93 @@
 import BaseHelper from './BaseHelper'
 
-class MoveHelper extends BaseHelper {
-  constructor () {
-    super()
-    this.el = null
+class MoveHelper {
+  constructor (transformHelper) {
+    this.transformHelper = transformHelper
 
     this._started = false
 
-    this._pos = { x: 0, y: 0 }
+    this._lastPos = { x: 0, y: 0 }
     this._startPos = { x: 0, y: 0 }
-    this._deltaPos = { x: 0, y: 0 }
+
+    this.moveHandler = this._moveHandler.bind(this)
+    this.startHandler = this._startHandler.bind(this)
+    this.endHandler = this._endHandler.bind(this)
+
+    this.bindEvents()
   }
 
   bindEvents () {
-    this.el.addEventListener('mousedown', this._startHandler)
-    this.el.addEventListener('mouseup', this._endHandler)
+    console.log('bindevent')
+    const { rootEl } = this.transformHelper
+    rootEl.addEventListener('mousedown', this.startHandler)
   }
 
   unbindEvents () {
-    this.el.removeEventListener('mousedown', this._startHandler)
-    this.el.removeEventListener('mouseup', this._endHandler)
+    const { rootEl } = this.transformHelper
+    rootEl.removeEventListener('mousedown', this.startHandler)
   }
 
-  _startHandler = e => {
+  _startHandler (e) {
+    console.log('start')
     this._started = true
-    this._startX = e.clientX
-    this._startY = e.clientY
-    this._deltaX = this._deltaY = 0
+    this._lastPos = this.getPosition()
+    this._startPos = {
+      x: e.clientX,
+      y: e.clientY
+    }
 
-    window.addEventListener('mousemove', this._moveHandler)
+    window.addEventListener('mousemove', this.moveHandler)
+    window.addEventListener('mouseup', this.endHandler)
   }
 
-  _endHandler = e => {
+  _endHandler (e) {
+    console.log('end')
     this._started = false
-    transformX += this._deltaX
-    transformY += this._deltaY
 
-    window.removeEventListener('mousemove', this._moveHandler)
+    window.removeEventListener('mousemove', this.moveHandler)
+    window.removeEventListener('mouseup', this.endHandler)
   }
 
-  _moveHandler = e => {
-    if (this._started) {
+  _moveHandler (e) {
+    console.log('move', this._started)
+    if (!this._started) {
       return
     }
 
     e.stopPropagation()
 
-    this._deltaX = e.clientX - this._startX
-    this._deltaY = e.clientY - this._startY
-
-    this.update()
+    const deltaX = e.clientX - this._startPos.x
+    const deltaY = e.clientY - this._startPos.y
+    
+    this.update({
+      x: this._lastPos.x + deltaX,
+      y: this._lastPos.y + deltaY
+    })
   }
 
   render () {
     return null
   }
 
-  update () {
+  getPosition () {
+    return {
+      x: this.transformHelper.transformations.left,
+      y: this.transformHelper.transformations.top
+    }
+  }
+
+  syncPosition ({ x, y }) {
+    this.transformHelper.transformations.left = x
+    this.transformHelper.transformations.top = y
+  }
+
+  update ({ x, y }) {
     // transform
+    console.log(this._deltaPos)
+    this.syncPosition({ x, y })
+
+    this.transformHelper.rootEl.style.transform = 
+    `translateX(${x}px) translateY(${y}px)`
   }
 }
 

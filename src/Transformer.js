@@ -29,12 +29,41 @@ export const setTransformStyle = (el, transformation) => {
   el.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`
 }
 
+export const toTransform = ({
+  top, left, width, height, rotation,
+  originWidth = 1, originHeight = 1
+}) => ({
+  x: left,
+  y: top,
+  rotate: rotation,
+  scaleX: width / originWidth,
+  scaleY: height / originHeight
+})
+
 // need to distinguish scale and resize
 
 class Transfomer {
   constructor (el) {
     this.el = el
-    this.transformation = getTransformationFromElement(el)
+    // this.transformation = getTransformationFromElement(el)
+    this.transformation = {
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
+      originWidth: 0,
+      originHeight: 0,
+      rotation: 0,
+      rotatePivot: { x: .5, y: .5 }
+    }
+  }
+
+  center () {
+    const { top, left, width, height } = this.transformation
+    return {
+      x: left + width / 2,
+      y: top + height / 2
+    }
   }
 
   transform (transformation = {}) {
