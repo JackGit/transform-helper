@@ -86,8 +86,9 @@ class MoveHelper {
     console.log(this._deltaPos)
     this.syncPosition({ x, y })
 
+    const { top, left, rotation } = this.transformHelper.transformations
     this.transformHelper.rootEl.style.transform = 
-    `translateX(${x}px) translateY(${y}px)`
+    `translateX(${left}px) translateY(${top}px) rotate(${rotation}deg)`
   }
 }
 
