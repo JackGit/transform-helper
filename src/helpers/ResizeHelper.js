@@ -94,9 +94,9 @@ class ResizeHelper {
     const sizeValue = { ...this._lastSize }
     const deltaX = e.clientX - this._startPos.x
     const deltaY = e.clientY - this._startPos.y
-    console.log(deltaX, deltaY)
+    console.log(deltaX, deltaY)    
 
-    switch (this.resizeType) {
+    switch (this._resizeType) {
       case RESIZE_TYPES.TL.key:
         sizeValue.top += deltaY
         sizeValue.left += deltaX
@@ -104,7 +104,7 @@ class ResizeHelper {
         sizeValue.height -= deltaY
       break;
       case RESIZE_TYPES.TC.key:
-        sizeValue.top += deltaY
+        sizeValue.top = Math.min(sizeValue.top + deltaY, sizeValue.top + sizeValue.height)
         sizeValue.height -= deltaY
       break;
       case RESIZE_TYPES.TR.key:
@@ -113,7 +113,7 @@ class ResizeHelper {
         sizeValue.height -= deltaY
       break;
       case RESIZE_TYPES.LC.key:
-        sizeValue.left += deltaX
+        sizeValue.left = Math.min(sizeValue.left + deltaX, sizeValue.left + sizeValue.width)
         sizeValue.width -= deltaX
       break;
       case RESIZE_TYPES.RC.key:
@@ -132,9 +132,13 @@ class ResizeHelper {
         sizeValue.height += deltaY
       break;
     }
-    // need to do the boundary check for width and height
-
-    this.update(sizeValue)
+    
+    this.update({
+      width: Math.max(sizeValue.width, 1),
+      height: Math.max(sizeValue.height, 1),
+      top: sizeValue.top,
+      left: sizeValue.left
+    })
   }
 
   _endHandler () {
@@ -157,15 +161,22 @@ class ResizeHelper {
   }
   
   update ({ top, left, width, height }) {
-    this.syncRotation({ top, left, width, height })
+    this.syncSize({ top, left, width, height })
 
     // convert top, left, width, height into transform attributes: translate and scale
     // and do the transform
 
-    const { top, left } = this.transformHelper.transformations
+    /* const { top, left } = this.transformHelper.transformations
     this.transformHelper.rootEl.style.transform = 
     `translateX(${left}px) translateY(${top}px) rotate(${rotation}deg)`
+    */
+   console.log(this.transformHelper.transformations)
 
+   this.transformHelper.rootEl.style.transform = 
+   `translateX(${this.transformHelper.transformations.left}px) translateY(${this.transformHelper.transformations.top}px)`
+   this.transformHelper.rootEl.style.width = this.transformHelper.transformations.width + 'px'
+   this.transformHelper.rootEl.style.height = this.transformHelper.transformations.height + 'px'
+   
     // this.transformHelper.transform({ ... })
   }
 }
