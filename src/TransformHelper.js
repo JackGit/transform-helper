@@ -2,6 +2,7 @@ import MoveHelper from './MoveHelper'
 import RotateHelper from './RotateHelper'
 import ScaleHelper from './ScaleHelper'
 import Transformer, { setTransformStyle } from './Transformer'
+import ResizeHelper from './helpers/ResizeHelper';
 
 /**
  * user interacts with helpers
@@ -43,8 +44,9 @@ class TransformHelper {
 
   _init () {
     this._createRootElement(this.options)
-    new MoveHelper(this)
-    new RotateHelper(this)
+    // new MoveHelper(this)
+    // new RotateHelper(this)
+    new ResizeHelper(this)
   }
 
   _attachEvents () {
@@ -69,6 +71,15 @@ class TransformHelper {
 
   link (el, options) {
     
+  }
+
+  transform (transformations = {}) {
+    this.transformations = {
+      ...this.transformations,
+      ...transformations
+    }
+    
+    this.transformer.transform(this.transformations)
   }
   
 }

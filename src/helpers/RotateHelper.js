@@ -80,12 +80,7 @@ class RotateHelper {
     window.removeEventListener('mousemove', this._moveHandler)
     window.removeEventListener('mouseup', this._endHandler)
 
-    if (this.disabled || !this.startPoint) {
-      return
-    }
-
-    this.startPoint = null
-    this.lastDegree += this.deltaDegree
+    this._started = false
   }
 
   getRotation () {
