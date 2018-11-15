@@ -3,11 +3,6 @@ import RotateHelper from './RotateHelper'
 import Transformer from './Transformer'
 import ResizeHelper from './helpers/ResizeHelper';
 
-const defaultOptions = {
-  userTransform: false,
-  zIndex: 100
-}
-
 const createRootElement = ({ zIndex }) => {
   const el = document.createElement('div')
   el.style.position = 'fixed'
@@ -17,6 +12,12 @@ const createRootElement = ({ zIndex }) => {
   document.body.appendChild(el)
   return el
 }
+
+const defaultOptions = {
+  userTransform: false,
+  zIndex: 100
+}
+
 /**
  * user interacts with helpers
  * helpers transform itself and emit transformed transformation info
@@ -51,7 +52,7 @@ class TransformHelper {
     new RotateHelper(this)
     new ResizeHelper(this)
   }  
-
+ 
   _render () {
 
   }
