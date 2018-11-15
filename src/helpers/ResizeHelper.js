@@ -54,6 +54,7 @@ class ResizeHelper {
       point.dataset.resizeType = type.key
       el.appendChild(point)
     })
+
     rootEl.appendChild(el)
     this.el = el
   }
@@ -63,22 +64,19 @@ class ResizeHelper {
   }
 
   _startHandler (e) {
-    e.preventDefault()
-    e.stopPropagation()
-
     const { resizeType } = e.target.dataset
-    console.log(resizeType)
 
     if (!resizeType) {
       return
     }
+
+    e.preventDefault()
+    e.stopPropagation()
     
     this._started = true
     this._resizeType = resizeType
     this._lastSize = this.getSize()
     this._startPos = { x: e.clientX, y: e.clientY }
-    
-    
     
     window.addEventListener('mousemove', this._moveHandler)
     window.addEventListener('mouseup', this._endHandler)
@@ -94,7 +92,6 @@ class ResizeHelper {
     const sizeValue = { ...this._lastSize }
     const deltaX = e.clientX - this._startPos.x
     const deltaY = e.clientY - this._startPos.y
-    console.log(deltaX, deltaY)    
 
     switch (this._resizeType) {
       case RESIZE_TYPES.TL.key:

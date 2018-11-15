@@ -44,7 +44,7 @@ class TransformHelper {
 
   _init () {
     this._createRootElement(this.options)
-    // new MoveHelper(this)
+    new MoveHelper(this)
     // new RotateHelper(this)
     new ResizeHelper(this)
   }
@@ -80,6 +80,8 @@ class TransformHelper {
     }
     
     this.transformer.transform(this.transformations)
+
+    this.emit('transform', this.transformations)
   }
   
 }

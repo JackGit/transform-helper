@@ -1,110 +1,92 @@
-const normalizeTransformation = ({
-  x, y,
-  rotate,
-  scaleX, scaleY
+const normalizeDescriptor = ({
+  width, height, ...rest
 }) => ({
-  x, y,
-  rotate,
-  scaleX: Math.max(0, scaleX),
-  scaleY: Math.max(0, scaleY)
+  width: Math.max(0, width),
+  height: Math.max(0, height),
+  ...rest
 })
 
-// TODO
-// { top, left, width, height, rotation, rotatePivot = { x: .5, y: .5 } }
-// { translateX, translateY, scaleX, scaleY, rotate, transformOrigin }
-const getTransformationFromElement = el => {
-  return {
-    x: 0,
-    y: 0,
-    // width: 0,
-    // height: 0,
-    rotate: 0,
-    scaleX: 1,
-    scaleY: 1
-  }
+export const updateByDescriptor = (el, {
+  top, left, width, height, rotation
+}) => {
+  el.style.top = top + 'px'
+  el.style.left = left + 'px'
+  el.style.width = width + 'px'
+  el.style.width = height + 'px'
+  el.style.transform = `rotate(${rotation}deg)`
 }
 
-export const setTransformStyle = (el, transformation) => {
-  const { x, y, rotate, scaleX, scaleY } = transformation
-  el.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`
+export const transformByDescriptor = (el, {
+  top, left, width, height, rotation
+}) => {
+  el.style.width = width + 'px'
+  el.style.width = height + 'px'
+  el.style.transform = `translateX(${left}px) translateY(${top}px) rotate(${rotation}deg)`
 }
 
-export const toTransform = ({
-  top, left, width, height, rotation,
-  originWidth = 1, originHeight = 1
-}) => ({
-  x: left,
-  y: top,
-  rotate: rotation,
-  scaleX: width / originWidth,
-  scaleY: height / originHeight
-})
+const defaultOptions = {
+  useTransform: false,
+  descriptor: {}
+}
 
-// need to distinguish scale and resize
-
-class Transfomer {
-  constructor (el) {
+export default class Transfomer {
+  /**
+   * 
+   * @param {Element} el has to be an absolute/fixed position element 
+   * @param {Object} descriptor 
+   */
+  constructor (el, options = {}) {
     this.el = el
-    // this.transformation = getTransformationFromElement(el)
-    this.transformation = {
+    this.options = { ...defaultOptions, ...options }
+    this.descriptor = {
       top: 0,
       left: 0,
       width: 0,
       height: 0,
-      originWidth: 0,
-      originHeight: 0,
       rotation: 0,
-      rotatePivot: { x: .5, y: .5 }
+      ...this.options.descriptor, // do not override privo for now
+      pivot: { x: .5, y: .5 }
     }
+
+    this.transform()
   }
 
-  center () {
-    const { top, left, width, height } = this.transformation
+  pivotPoint () {
+    const { top, left, width, height, pivot } = this.descriptor
     return {
-      x: left + width / 2,
-      y: top + height / 2
+      x: left + width * pivot.x,
+      y: top + height * pivot.y
     }
   }
 
-  transform (transformation = {}) {
-    this.transformation = normalizeTransformation({
-      ...this.transformation,
-      ...transformation
+  transform (descriptor = {}) {
+    this.descriptor = normalizeDescriptor({
+      ...this.descriptor,
+      ...descriptor
     })
-    setTransformStyle(this.el, this.transformation)
+
+    if (this.options.useTransform) {
+      transformByDescriptor(this.el, this.descriptor)
+    } else {
+      updateByDescriptor(this.el, this.descriptor)
+    }
   }
 
-  translate (x, y) {
-    this.transformation.x = x
-    this.transformation.y = y
-    this.transform()
+  move (x = 0, y = 0) {
+    this.transform({ top: y, left: x })
   }
 
-  translateBy (deltaX, deltaY) {
-    this.transformation.x += deltaX
-    this.transformation.y += deltaY
-    this.transform()
+  moveBy (deltaX = 0, deltaY = 0) {
+    const { top, left } = this.descriptor
+    this.transform({ top: top + deltaY, left: left + deltaX })
   }
 
-  rotate (x) {
-    this.transformation.rotate = x
-    this.transform()
+  rotate (deg = 0) {
+    this.transform({ rotation: deg })
   }
 
-  rotateBy (deltaX) {
-    this.transformation.rotate += deltaX
-    this.transform()
-  }
-
-  scale (/* x, y */) {
-    this.transformation.scaleX = arguments[0]
-    this.transformation.scaleY = arguments.length === 1 ? arguments[0] : arguments[1]
-    this.transform()
-  }
-
-  scaleBy (/* deltaX, deltaY */) {
-    this.transformation.scaleX += arguments[0]
-    this.transformation.scaleY += arguments.length === 1 ? arguments[0] : arguments[1]
-    this.transform()
+  rotateBy (deltaDeg) {
+    const { rotation } = this.descriptor
+    this.transform({ rotation: rotation + deltaDeg})
   }
 }
