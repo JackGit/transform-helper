@@ -1,19 +1,33 @@
 import MoveHelper from './MoveHelper'
 import RotateHelper from './RotateHelper'
-import ScaleHelper from './ScaleHelper'
-import Transformer, { setTransformStyle } from './Transformer'
+import Transformer from './Transformer'
 import ResizeHelper from './helpers/ResizeHelper';
 
+const defaultOptions = {
+  userTransform: false,
+  zIndex: 100
+}
+
+const createRootElement = ({ zIndex }) => {
+  const el = document.createElement('div')
+  el.style.position = 'fixed'
+  el.style.display = 'block'
+  el.style.background = 'rgba(255,0,0,.5)'
+  el.style.zIndex = zIndex
+  document.body.appendChild(el)
+  return el
+}
 /**
  * user interacts with helpers
  * helpers transform itself and emit transformed transformation info
  * and set the binded el with setTransformStyle(targetEl, transformation)
  */
 class TransformHelper {
-  constructor (options) {
+  constructor (options = {}) {
     this.rootEl = null
-    this.options = options
+    this.options = { ...defaultOptions, ...options }
 
+    this.transformer = null
     this.transformations = {
       top: options.top,
       left: options.left,
@@ -25,37 +39,18 @@ class TransformHelper {
     this._init()
   }
 
-  _createRootElement ({ top, left, width, height }) {
-    const el = document.createElement('div')
-
-    el.style.position = 'fixed'
-    el.style.display = 'block'
-    el.style.top = 0
-    el.style.left = 0
-    el.style.width = width + 'px'
-    el.style.height = height + 'px'
-    el.style.zIndex = 10
-    el.style.background = 'rgba(255,0,0,.5)'
-    el.style.transform = `translateX(${left}px) translateY(${top}px)`
-
-    document.body.appendChild(el)
-    this.rootEl = el
-  }
-
   _init () {
-    this._createRootElement(this.options)
+    const { zIndex, userTransform } = this.options
+
+    this.rootEl = createRootElement({ zIndex })
+    this.transfomer = new Transformer(this.rootEl, {
+      userTransform
+    })
+
     new MoveHelper(this)
-    // new RotateHelper(this)
+    new RotateHelper(this)
     new ResizeHelper(this)
-  }
-
-  _attachEvents () {
-
-  }
-
-  _detachEvents () {
-
-  }
+  }  
 
   _render () {
 
@@ -73,15 +68,11 @@ class TransformHelper {
     
   }
 
-  transform (transformations = {}) {
-    this.transformations = {
-      ...this.transformations,
-      ...transformations
-    }
-    
-    this.transformer.transform(this.transformations)
-
-    this.emit('transform', this.transformations)
+  transform (descriptor) {
+    this.transformer.transform(descriptor)
+    // this.emit('transform', this.transformations)
   }
   
 }
+
+export default TransformHelper
