@@ -1,31 +1,37 @@
 /**
- * render helper UI
- * handler events
- * know how to do the transform
+ * A Helper owns its own state, and event handling
+ * but its lifecycle is controlled by TransformHelper
  */
-
-class BaseHelper extends EventEmitter {
-  constructor () {
-    super()
-    this.helperManager = helperManager
+class BaseHelper {
+  constructor (transformHelper) {
+    this.transformHelper = transformHelper
+  }
+  
+  /**
+   * invokes when TransformHelper creates a helper
+   */
+  create () {
+    // create helper's own UI
+    // bind events
+    // etc
   }
 
-  bindEvents () {
-
+  /**
+   * invokes then TransformHelper do the transform
+   * the transform can be triggered by other helper or 
+   * directly called TransformHelper.transform() method
+   */
+  update (descriptor) {
+    // update helper's own UI if needed
+    // etc
   }
 
-  unbindEvents () {
-
+  /**
+   * invokes in TransformHelper is going to destroy
+   */
+  destroy () {
+    // unbind event handlers and clear elements created
   }
-
-  transform () {
-    // this.helperManager.transformer.xxx()
-  }
-
-  render () {
-    // render UI to this.helperManager.rootEl
-  }
-
 }
 
 export default BaseHelper

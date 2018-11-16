@@ -1,55 +1,55 @@
 import BaseHelper from './BaseHelper'
 
-class MoveHelper {
+class MoveHelper extends BaseHelper {
   constructor (transformHelper) {
-    this.transformHelper = transformHelper
+    super(transformHelper)
 
     this._started = false
-
     this._lastPos = { x: 0, y: 0 }
     this._startPos = { x: 0, y: 0 }
-
-    this.moveHandler = this._moveHandler.bind(this)
-    this.startHandler = this._startHandler.bind(this)
-    this.endHandler = this._endHandler.bind(this)
-
-    this.bindEvents()
   }
 
-  bindEvents () {
-    console.log('bindevent')
+  create () {
+    this._bindEvents()
+  }
+
+  destroy () {
+    this._unbindEvents()
+  }
+
+  update () {
+    // do nothing
+  }
+
+  _bindEvents () {
     const { rootEl } = this.transformHelper
-    rootEl.addEventListener('mousedown', this.startHandler)
+    rootEl.addEventListener('mousedown', this._startHandler)
   }
 
-  unbindEvents () {
+  _unbindEvents () {
     const { rootEl } = this.transformHelper
-    rootEl.removeEventListener('mousedown', this.startHandler)
+    rootEl.removeEventListener('mousedown', this._startHandler)
   }
 
-  _startHandler (e) {
-    console.log('start')
+  _startHandler = (e) => {
+    const { top, left } = this.transformHelper.transformer.descriptor
+    this._lastPos = { x: left, y: top }
+    this._startPos = { x: e.clientX, y: e.clientY }
+
     this._started = true
-    this._lastPos = this.getPosition()
-    this._startPos = {
-      x: e.clientX,
-      y: e.clientY
-    }
 
-    window.addEventListener('mousemove', this.moveHandler)
-    window.addEventListener('mouseup', this.endHandler)
+    window.addEventListener('mousemove', this._moveHandler)
+    window.addEventListener('mouseup', this._endHandler)
   }
 
-  _endHandler (e) {
-    console.log('end')
+  _endHandler = () => {
     this._started = false
 
-    window.removeEventListener('mousemove', this.moveHandler)
-    window.removeEventListener('mouseup', this.endHandler)
+    window.removeEventListener('mousemove', this._moveHandler)
+    window.removeEventListener('mouseup', this._endHandler)
   }
 
-  _moveHandler (e) {
-    console.log('move', this._started)
+  _moveHandler = (e) => {
     if (!this._started) {
       return
     }
@@ -59,36 +59,14 @@ class MoveHelper {
     const deltaX = e.clientX - this._startPos.x
     const deltaY = e.clientY - this._startPos.y
     
-    this.update({
+    this._transform({
       x: this._lastPos.x + deltaX,
       y: this._lastPos.y + deltaY
     })
   }
 
-  render () {
-    return null
-  }
-
-  getPosition () {
-    return {
-      x: this.transformHelper.transformations.left,
-      y: this.transformHelper.transformations.top
-    }
-  }
-
-  syncPosition ({ x, y }) {
-    this.transformHelper.transformations.left = x
-    this.transformHelper.transformations.top = y
-  }
-
-  update ({ x, y }) {
-    // transform
-    console.log(this._deltaPos)
-    this.syncPosition({ x, y })
-
-    const { top, left, rotation } = this.transformHelper.transformations
-    this.transformHelper.rootEl.style.transform = 
-    `translateX(${left}px) translateY(${top}px) rotate(${rotation}deg)`
+  _transform ({ x, y }) {
+    this.transformHelper.transform({ top: y, left: x })
   }
 }
 

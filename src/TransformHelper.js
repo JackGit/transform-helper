@@ -13,29 +13,25 @@ const createRootElement = ({ zIndex }) => {
   return el
 }
 
-const defaultOptions = {
-  userTransform: false,
-  zIndex: 100
+const HelperClassMapping = {
+  move: MoveHelper,
+  reize: ResizeHelper,
+  rotate: RotateHelper
 }
 
-/**
- * user interacts with helpers
- * helpers transform itself and emit transformed transformation info
- * and set the binded el with setTransformStyle(targetEl, transformation)
- */
+const defaultOptions = {
+  userTransform: false,
+  zIndex: 100,
+  helpers: ['move', 'resize', 'rotate']
+}
+
 class TransformHelper {
   constructor (options = {}) {
     this.rootEl = null
     this.options = { ...defaultOptions, ...options }
 
     this.transformer = null
-    this.transformations = {
-      top: options.top,
-      left: options.left,
-      width :options.width,
-      height: options.height,
-      rotation: options.rotation
-    }
+    this.helpers = {}
 
     this._init()
   }
@@ -44,34 +40,41 @@ class TransformHelper {
     const { zIndex, userTransform } = this.options
 
     this.rootEl = createRootElement({ zIndex })
-    this.transfomer = new Transformer(this.rootEl, {
-      userTransform
+    this.transfomer = new Transformer(this.rootEl, { userTransform })
+
+    this.options.helpers.forEach(helperName => {
+      const HelperClass = HelperClassMapping[helperName]
+
+      if (!HelperClass) {
+        console.warn(`Invalid helper ${helperName}`)
+        return
+      }
+
+      if (this.helpers[helperName]) {
+        console.warn(`${helperName} is overridden`)
+      }
+
+      const helper = new HelperClass(this)
+      helper.create()
+      this.helpers[helperName] = helper
     })
-
-    new MoveHelper(this)
-    new RotateHelper(this)
-    new ResizeHelper(this)
   }  
- 
-  _render () {
-
-  }
-
-  _update () {
-
-  }
 
   destroy () {
-
-  }
-
-  link (el, options) {
-    
+    Object.values(this.helpers).forEach(helper => helper.destroy())
+    this.helpers = {}
+    this.transformer = null
+    this.rootEl.remove()
   }
 
   transform (descriptor) {
     this.transformer.transform(descriptor)
+    Object.values(this.helpers).forEach(helper => helper.update(descriptor))
     // this.emit('transform', this.transformations)
+  }
+
+  link (el, options) {
+    
   }
   
 }
