@@ -1,5 +1,7 @@
 import BaseHelper from './BaseHelper'
 
+// options: { boundary, snap, direction }
+
 class MoveHelper extends BaseHelper {
   constructor (transformHelper) {
     super(transformHelper)

@@ -11,6 +11,8 @@ const RESIZE_TYPES = {
   BR: { key: 'bottom-right', top: '100%', left: '100%' },
 }
 
+// options: { keepRatio, maxWidth, minWidth, maxHeight, minHeight }
+
 class ResizeHelper extends BaseHelper {
 
   constructor (transformHelper) {

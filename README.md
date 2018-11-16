@@ -72,3 +72,11 @@ transformHelper.enableRotate()
 transformHelper.disableRotate()
 transformHelper.rotateEnabled
 ```
+
+### how to customize helper's UI
+
+### how to extends helpers
+
+### how to define a customized helper
+
+### support touch events
