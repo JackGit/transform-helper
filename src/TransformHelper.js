@@ -54,14 +54,18 @@ class TransformHelper {
         console.warn(`${helperName} is overridden`)
       }
 
-      const helper = new HelperClass(this)
-      helper.create()
-      this.helpers[helperName] = helper
+      this.helpers[helperName] = new HelperClass(this)
     })
-  }  
+
+    this._invokeHelpers('create')
+  }
+
+  _invokeHelpers (method, ...args) {
+    Object.values(this.helpers).forEach(helper => helper[method](...args))
+  }
 
   destroy () {
-    Object.values(this.helpers).forEach(helper => helper.destroy())
+    this._invokeHelpers('destroy')
     this.helpers = {}
     this.transformer = null
     this.rootEl.remove()
@@ -69,7 +73,7 @@ class TransformHelper {
 
   transform (descriptor) {
     this.transformer.transform(descriptor)
-    Object.values(this.helpers).forEach(helper => helper.update(descriptor))
+    this._invokeHelpers('update', descriptor)
     // this.emit('transform', this.transformations)
   }
 
