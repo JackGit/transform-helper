@@ -1,7 +1,7 @@
 import MoveHelper from './MoveHelper'
 import RotateHelper from './RotateHelper'
+import ResizeHelper from './helpers/ResizeHelper'
 import Transformer from './Transformer'
-import ResizeHelper from './helpers/ResizeHelper';
 
 const createRootElement = ({ zIndex }) => {
   const el = document.createElement('div')
@@ -13,6 +13,20 @@ const createRootElement = ({ zIndex }) => {
   return el
 }
 
+const normalizeHelperConfig = helperConfig => {
+  if (typeof helperConfig === 'string') {
+    return {
+      name: helperConfig,
+      options: {}
+    }
+  } else {
+    return {
+      name: helperConfig[0],
+      options: helperConfig[1]
+    }
+  }
+}
+
 const HelperClassMapping = {
   move: MoveHelper,
   reize: ResizeHelper,
@@ -22,7 +36,7 @@ const HelperClassMapping = {
 const defaultOptions = {
   userTransform: false,
   zIndex: 100,
-  helpers: ['move', 'resize', 'rotate']
+  helpers: ['move', 'resize', 'rotate'] // ['move', ['resize', options], 'rotate']
 }
 
 class TransformHelper {
@@ -42,19 +56,19 @@ class TransformHelper {
     this.rootEl = createRootElement({ zIndex })
     this.transfomer = new Transformer(this.rootEl, { userTransform })
 
-    this.options.helpers.forEach(helperName => {
-      const HelperClass = HelperClassMapping[helperName]
+    this.options.helpers.map(normalizeHelperConfig).forEach(({ name, options }) => {
+      const HelperClass = HelperClassMapping[name]
 
       if (!HelperClass) {
-        console.warn(`Invalid helper ${helperName}`)
+        console.warn(`Invalid helper ${name}`)
         return
       }
 
-      if (this.helpers[helperName]) {
-        console.warn(`${helperName} is overridden`)
+      if (this.helpers[name]) {
+        console.warn(`${name} is overridden`)
       }
 
-      this.helpers[helperName] = new HelperClass(this)
+      this.helpers[name] = new HelperClass(this, options)
     })
 
     this._invokeHelpers('create')
