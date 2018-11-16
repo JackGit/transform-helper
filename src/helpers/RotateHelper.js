@@ -1,29 +1,18 @@
 import BaseHelper from './BaseHelper'
 
-class RotateHelper {
+class RotateHelper extends BaseHelper {
 
   constructor (transformHelper) {
-    this.transformHelper = transformHelper
+    super(transformHelper)
+
     this.el = null
 
     this._started = false
     this._lastRotation = 0
     this._startPos = { x: 0, y: 0 }
-    this._pivotPos = { x: 0, y: 0 }
-
-    this._startHandler = this._startHandler.bind(this)
-    this._moveHandler = this._moveHandler.bind(this)
-    this._endHandler = this._endHandler.bind(this)
-
-    this.init()
   }
 
-  init () {
-    this.createHelperUI()
-    this.bindEvents()
-  }
-
-  createHelperUI () {
+  create () {
     const { rootEl } = this.transformHelper
     const el = document.createElement('div')
     el.style.position = 'absolute'
@@ -35,68 +24,67 @@ class RotateHelper {
     el.style.transform = 'translateX(-50%)'
     rootEl.appendChild(el)
     this.el = el
+
+    this._bindEvents()
   }
 
-  bindEvents () {
+  destroy () {
+    this._unbindEvents()
+    this.el.remove()
+    this.el = null
+  }
+
+  update (descriptor) {
+    // do nothing
+  }
+
+  _bindEvents () {
     this.el.addEventListener('mousedown', this._startHandler)
   }
 
-  _startHandler (e) {
+  _unbindEvents () {
+    this.el.removeEventListener('mousedown', this._startHandler)
+  }
+
+  _startHandler = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const { top, left, width, height } = this.transformHelper.transformations
-    this._started = true
-    this._lastRotation = this.getRotation()
+    const { rotation } = this.transformHelper.transformer.descriptor
+    
+    this._lastRotation = rotation
     this._startPos = { x: e.clientX, y: e.clientY }
-    this._pivotPos = {
-      x: left + width / 2,
-      y: top + height / 2
-    }
-    console.log(this._pivotPos)
+    this._started = true
 
     window.addEventListener('mousemove', this._moveHandler)
     window.addEventListener('mouseup', this._endHandler)
   }
 
-  _moveHandler (e) {
+  _moveHandler = (e) => {
     if (!this._started) {
       return
     }
 
     e.preventDefault()
 
-
     const deltaDegree = deg(
-      this._pivotPos,
+      this.transformerHelper.transformer.pivotPoint(),
       this._startPos,
       { x: e.clientX, y: e.clientY }
     )
 
-    this.update(this._lastRotation + deltaDegree)
+    this._transform(this._lastRotation + deltaDegree)
   }
 
-  _endHandler () {
+  _endHandler = () => {
     window.removeEventListener('mousemove', this._moveHandler)
     window.removeEventListener('mouseup', this._endHandler)
 
     this._started = false
   }
 
-  getRotation () {
-    return this.transformHelper.transformations.rotation
-  }
-
-  syncRotation (value) {
-    this.transformHelper.transformations.rotation = value
-  }
-  
-  update (rotation) {
-    this.syncRotation(rotation)
-
-    const { top, left } = this.transformHelper.transformations
-    this.transformHelper.rootEl.style.transform = 
-    `translateX(${left}px) translateY(${top}px) rotate(${rotation}deg)`
+  _transform (rotation) {
+    this.transformHelper.transform({ rotation })
   }
 }
 

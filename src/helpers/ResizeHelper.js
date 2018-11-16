@@ -1,3 +1,4 @@
+import BaseHelper from './BaseHelper'
 
 const RESIZE_TYPES = {
   TL: { key: 'top-left', top: '0', left: '0' },
@@ -10,10 +11,10 @@ const RESIZE_TYPES = {
   BR: { key: 'bottom-right', top: '100%', left: '100%' },
 }
 
-class ResizeHelper {
+class ResizeHelper extends BaseHelper {
 
   constructor (transformHelper) {
-    this.transformHelper = transformHelper
+    super(transformHelper)
     this.el = null
 
     this._started = false
@@ -21,20 +22,9 @@ class ResizeHelper {
     this._startPos = { x: 0, y: 0 }
 
     this._resizeType = ''
-
-    this._startHandler = this._startHandler.bind(this)
-    this._moveHandler = this._moveHandler.bind(this)
-    this._endHandler = this._endHandler.bind(this)
-
-    this.init()
   }
 
-  init () {
-    this.createHelperUI()
-    this.bindEvents()
-  }
-
-  createHelperUI () {
+  create () {
     const { rootEl } = this.transformHelper
     const el = document.createElement('div')
     el.style.position = 'absolute'
@@ -57,13 +47,29 @@ class ResizeHelper {
 
     rootEl.appendChild(el)
     this.el = el
+
+    this._bindEvents()
   }
 
-  bindEvents () {
+  destroy () {
+    this._unbindEvents()
+    this.el.remove()
+    this.el = null
+  }
+
+  update (descriptor) {
+    // do nothing
+  }
+
+  _bindEvents () {
     this.el.addEventListener('mousedown', this._startHandler)
   }
 
-  _startHandler (e) {
+  _unbindEvents () {
+    this.el.addEventListener('mousedown', this._startHandler)
+  }
+
+  _startHandler = (e) => {
     const { resizeType } = e.target.dataset
 
     if (!resizeType) {
@@ -72,17 +78,19 @@ class ResizeHelper {
 
     e.preventDefault()
     e.stopPropagation()
+
+    const { top, left, width, height } = this.transformHelper.transformer.descriptor
     
-    this._started = true
     this._resizeType = resizeType
-    this._lastSize = this.getSize()
+    this._lastSize = { top, left, width, height }
     this._startPos = { x: e.clientX, y: e.clientY }
+    this._started = true
     
     window.addEventListener('mousemove', this._moveHandler)
     window.addEventListener('mouseup', this._endHandler)
   }
 
-  _moveHandler (e) {
+  _moveHandler = (e) => {
     if (!this._started) {
       return
     }
@@ -130,50 +138,19 @@ class ResizeHelper {
       break;
     }
     
-    this.update({
-      width: Math.max(sizeValue.width, 1),
-      height: Math.max(sizeValue.height, 1),
-      top: sizeValue.top,
-      left: sizeValue.left
-    })
+    this._transform(sizeValue)
   }
 
-  _endHandler () {
+  _endHandler = () => {
     window.removeEventListener('mousemove', this._moveHandler)
     window.removeEventListener('mouseup', this._endHandler)
 
     this._started = false
   }
 
-  getSize () {
-    const { top, left, width, height } = this.transformHelper.transformations
-    return { top, left, width, height }
-  }
-
-  syncSize (value) {
-    this.transformHelper.transformations = {
-      ...this.transformHelper.transformations,
-      ...value
-    }
-  }
-  
-  update ({ top, left, width, height }) {
-    this.syncSize({ top, left, width, height })
-
-    // convert top, left, width, height into transform attributes: translate and scale
-    // and do the transform
-
-    /* const { top, left } = this.transformHelper.transformations
-    this.transformHelper.rootEl.style.transform = 
-    `translateX(${left}px) translateY(${top}px) rotate(${rotation}deg)`
-    */
-   console.log(this.transformHelper.transformations)
-
-   this.transformHelper.rootEl.style.transform = 
-   `translateX(${this.transformHelper.transformations.left}px) translateY(${this.transformHelper.transformations.top}px)`
-   this.transformHelper.rootEl.style.width = this.transformHelper.transformations.width + 'px'
-   this.transformHelper.rootEl.style.height = this.transformHelper.transformations.height + 'px'
-   
-    // this.transformHelper.transform({ ... })
+  _transform (sizeValue) {
+    this.transformHelper.transform(sizeValue)
   }
 }
+
+export default ResizeHelper
