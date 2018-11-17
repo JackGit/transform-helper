@@ -91,6 +91,21 @@ class TransformHelper {
     // this.emit('transform', this.transformations)
   }
 
+  /**
+   * usage like:
+   *   const th = new TransformHelper()
+   *   th.link(targetEl)
+   *   th.activate(['move', ['rotate', options], 'resize'])
+   */
+  activate (options) {
+    // destroy all the helpers
+    // then create them with the new options again
+  }
+
+  deactivate () {
+    this._invokeHelpers('destroy')
+  }
+
   link (el, options) {
     
   }
