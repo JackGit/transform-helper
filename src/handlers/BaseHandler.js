@@ -1,6 +1,7 @@
 class BaseHandler {
-  constructor (el) {
+  constructor (el, transformHelper) {
     this.el = el
+    this.transformHelper = transformHelper
   }
 
   onStart () {
