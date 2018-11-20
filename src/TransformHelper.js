@@ -1,7 +1,14 @@
-import MoveHelper from './MoveHelper'
-import RotateHelper from './RotateHelper'
+import BaseHelper from './helpers/BaseHelper'
+import MoveHelper from './helpers/MoveHelper'
 import ResizeHelper from './helpers/ResizeHelper'
+import RotateHelper from './helpers/RotateHelper'
 import Transformer from './Transformer'
+
+const HelperClassMapping = {
+  move: MoveHelper,
+  resize: ResizeHelper,
+  rotate: RotateHelper
+}
 
 const createRootElement = ({ zIndex }) => {
   const el = document.createElement('div')
@@ -13,30 +20,38 @@ const createRootElement = ({ zIndex }) => {
   return el
 }
 
-const normalizeHelperConfig = helperConfig => {
-  if (typeof helperConfig === 'string') {
-    return {
-      name: helperConfig,
-      options: {}
-    }
+/**
+ * helperConfigValue can be:
+ *  String value as helper name, like 'move'
+ *  Array as ['move', options]
+ *  BaseHelper instance
+ * @param {String|Array|BaseHelper} helperConfigValue 
+ */
+const createHelperInstance = helperConfigValue => {
+  if (helperConfigValue instanceof BaseHelper) {
+    return helperConfigValue
   } else {
-    return {
-      name: helperConfig[0],
-      options: helperConfig[1]
+    let name, options
+    if (typeof helperConfigValue === 'string') {
+      name = helperConfigValue
+    } else if (Array.isArray(helperConfigValue)) {
+      name = helperConfigValue[0]
+      options = helperConfigValue[1] || undefined
     }
-  }
-}
 
-const HelperClassMapping = {
-  move: MoveHelper,
-  reize: ResizeHelper,
-  rotate: RotateHelper
+    const HelperClass = HelperClassMapping[name]
+    if (!HelperClass) {
+      console.warn(`cannot find helper class for ${name}`)
+      return
+    }
+
+    return new HelperClass(options)
+  }
 }
 
 const defaultOptions = {
   userTransform: false,
-  zIndex: 100,
-  helpers: ['move', 'resize', 'rotate'] // ['move', ['resize', options], 'rotate']
+  zIndex: 100
 }
 
 class TransformHelper {
@@ -45,7 +60,7 @@ class TransformHelper {
     this.options = { ...defaultOptions, ...options }
 
     this.transformer = null
-    this.helpers = {}
+    this.helpers = []
 
     this._init()
   }
@@ -55,27 +70,15 @@ class TransformHelper {
 
     this.rootEl = createRootElement({ zIndex })
     this.transfomer = new Transformer(this.rootEl, { userTransform })
-
-    this.options.helpers.map(normalizeHelperConfig).forEach(({ name, options }) => {
-      const HelperClass = HelperClassMapping[name]
-
-      if (!HelperClass) {
-        console.warn(`Invalid helper ${name}`)
-        return
-      }
-
-      if (this.helpers[name]) {
-        console.warn(`${name} is overridden`)
-      }
-
-      this.helpers[name] = new HelperClass(this, options)
-    })
-
-    this._invokeHelpers('create')
   }
 
   _invokeHelpers (method, ...args) {
-    Object.values(this.helpers).forEach(helper => helper[method](...args))
+    this.helpers.forEach(helper => helper[method](...args))
+  }
+
+  _createHelpers (helpers) {
+    this.helpers = helpers.map(createHelperInstance)
+    this._invokeHelpers('create')
   }
 
   destroy () {
@@ -98,7 +101,8 @@ class TransformHelper {
    *   th.activate(['move', ['rotate', options], 'resize', new MyResizeHelper()])
    * 
    */
-  activate (options) {
+  activate (helpers = []) {
+    this._createHelpers(helpers)
     // destroy all the helpers
     // then create them with the new options again
   }
