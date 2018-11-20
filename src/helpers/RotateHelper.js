@@ -29,6 +29,7 @@ class RotateHelper extends BaseHelper {
 
   destroy () {
     this.handler.unbindEvents()
+    this.handler = null
     this.el.remove()
     this.el = null
   }

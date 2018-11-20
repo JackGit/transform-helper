@@ -1,13 +1,16 @@
-class ResizeTLHandler extends BaseHandler {
+import BaseHandler from './BaseHandler'
+
+class MoveHandler extends BaseHandler {
   constructor (el, transformerHelper) {
     super(el, transformerHelper)
     this._started = false
-    this._lastRotation = 0
+    this._lastPos = { x: 0, y: 0 }
     this._startPos = { x: 0, y: 0 }
   }
 
   bindEvents () {
-    this.el.addEventListener('mousedown', this.onStart)
+    const { rootEl } = this.transformHelper
+    rootEl.addEventListener('mousedown', this.onStart)
   }
 
   unbindEvents () {
@@ -15,13 +18,10 @@ class ResizeTLHandler extends BaseHandler {
   }
 
   onStart = e => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const { rotation } = this.transformHelper.transformer.descriptor
-    
-    this._lastRotation = rotation
+    const { top, left } = this.transformHelper.transformer.descriptor
+    this._lastPos = { x: left, y: top }
     this._startPos = { x: e.clientX, y: e.clientY }
+
     this._started = true
 
     window.addEventListener('mousemove', this.onMove)
@@ -33,15 +33,15 @@ class ResizeTLHandler extends BaseHandler {
       return
     }
 
-    e.preventDefault()
+    e.stopPropagation()
 
-    const deltaDegree = deg(
-      this.transformerHelper.transformer.pivotPoint(),
-      this._startPos,
-      { x: e.clientX, y: e.clientY }
-    )
-
-    this.transform(this._lastRotation + deltaDegree)
+    const deltaX = e.clientX - this._startPos.x
+    const deltaY = e.clientY - this._startPos.y
+    
+    this.transform({
+      x: this._lastPos.x + deltaX,
+      y: this._lastPos.y + deltaY
+    })
   }
 
   onEnd = () => {
@@ -51,9 +51,9 @@ class ResizeTLHandler extends BaseHandler {
     this._started = false
   }
 
-  transform (rotation) {
-    this.transformHelper.transform({ rotation })
+  transform ({ x, y }) {
+    this.transformHelper.transform({ top: y, left: x })
   }
 }
 
-export default ResizeTLHandler
+export default MoveHandler

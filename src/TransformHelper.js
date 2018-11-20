@@ -95,7 +95,8 @@ class TransformHelper {
    * usage like:
    *   const th = new TransformHelper()
    *   th.link(targetEl)
-   *   th.activate(['move', ['rotate', options], 'resize'])
+   *   th.activate(['move', ['rotate', options], 'resize', new MyResizeHelper()])
+   * 
    */
   activate (options) {
     // destroy all the helpers
