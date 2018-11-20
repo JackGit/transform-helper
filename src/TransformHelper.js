@@ -82,8 +82,7 @@ class TransformHelper {
   }
 
   destroy () {
-    this._invokeHelpers('destroy')
-    this.helpers = {}
+    this.deactivate('destroy')
     this.transformer = null
     this.rootEl.remove()
   }
@@ -102,19 +101,18 @@ class TransformHelper {
    * 
    */
   activate (helpers = []) {
+    this.deactivate()
     this._createHelpers(helpers)
-    // destroy all the helpers
-    // then create them with the new options again
   }
 
   deactivate () {
     this._invokeHelpers('destroy')
+    this.helpers = []
   }
 
-  link (el, options) {
-    
-  }
-  
+  link (el) {}
+
+  cover (el) {}
 }
 
 export default TransformHelper
