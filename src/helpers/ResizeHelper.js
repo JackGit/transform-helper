@@ -29,15 +29,15 @@ class ResizeHelper extends BaseHelper {
     el.style.width = '100%'
     el.style.height = '100%'
     
-    Object.values(RESIZE_TYPES).forEach(type => {
+    Object.keys(RESIZE_TYPES).forEach(type => {
       const point = document.createElement('div')
       point.style.position = 'absolute'
       point.style.display = 'inline-block'
       point.style.width = '9px'
       point.style.height = '9px'
       point.style.background = 'red'
-      point.style.top = type.top
-      point.style.left = type.left
+      point.style.top = RESIZE_TYPES[type].top
+      point.style.left = RESIZE_TYPES[type].left
       point.style.transform = 'translateX(-50%) translateY(-50%)'
       el.appendChild(point)
       

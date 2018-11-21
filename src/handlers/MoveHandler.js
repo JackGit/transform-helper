@@ -1,8 +1,8 @@
 import BaseHandler from './BaseHandler'
 
 class MoveHandler extends BaseHandler {
-  constructor (el, transformerHelper) {
-    super(el, transformerHelper)
+  constructor (el, transformHelper) {
+    super(el, transformHelper)
     this._started = false
     this._lastPos = { x: 0, y: 0 }
     this._startPos = { x: 0, y: 0 }

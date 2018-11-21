@@ -1,8 +1,8 @@
 import BaseHandler from './BaseHandler'
 
 class RotateHandler extends BaseHandler {
-  constructor (el, transformerHelper) {
-    super(el, transformerHelper)
+  constructor (el, transformHelper) {
+    super(el, transformHelper)
     this._started = false
     this._lastRotation = 0
     this._startPos = { x: 0, y: 0 }
@@ -38,7 +38,7 @@ class RotateHandler extends BaseHandler {
     e.preventDefault()
 
     const deltaDegree = deg(
-      this.transformerHelper.transformer.pivotPoint(),
+      this.transformHelper.transformer.pivotPoint(),
       this._startPos,
       { x: e.clientX, y: e.clientY }
     )

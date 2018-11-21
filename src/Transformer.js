@@ -12,7 +12,7 @@ export const updateByDescriptor = (el, {
   el.style.top = top + 'px'
   el.style.left = left + 'px'
   el.style.width = width + 'px'
-  el.style.width = height + 'px'
+  el.style.height = height + 'px'
   el.style.transform = `rotate(${rotation}deg)`
 }
 

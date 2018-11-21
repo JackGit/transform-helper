@@ -12,11 +12,11 @@ const RESIZE_TYPES = {
 }
 
 class ResizeHandler extends BaseHandler {
-  constructor (el, transformerHelper, options = {}) {
-    super(el, transformerHelper)
+  constructor (el, transformHelper, options = {}) {
+    super(el, transformHelper)
 
     if (!Object.values(RESIZE_TYPES).includes(options.type)) {
-      console.error(`ResizeHandler options.type value is not valid`)
+      console.error(`ResizeHandler options.type ${options.type} value is not valid`)
       return
     }
 
@@ -53,6 +53,8 @@ class ResizeHandler extends BaseHandler {
     if (!this._started) {
       return
     }
+
+    console.log(this.resizeHandlerType)
 
     e.preventDefault()
 
@@ -96,7 +98,7 @@ class ResizeHandler extends BaseHandler {
         sizeValue.height += deltaY
       break;
     }
-    
+    console.log(sizeValue)
     this.transform(sizeValue)
   }
 
