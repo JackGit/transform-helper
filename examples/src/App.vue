@@ -7,11 +7,19 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import TransformHelper from 'transform-helper'
 
 export default {
   name: 'app',
+
   components: {
     HelloWorld
+  },
+
+  mounted () {
+    window.t = new TransformHelper()
+    t.transform({ top: 100, left: 100, width: 100, height: 100 })
+    t.activate(['move', 'resize', 'rotate'])
   }
 }
 </script>

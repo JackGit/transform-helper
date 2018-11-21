@@ -14,7 +14,7 @@ class RotateHelper extends BaseHelper {
     const { rootEl } = this.transformHelper
     const el = document.createElement('div')
     el.style.position = 'absolute'
-    el.style.top = '-50%'
+    el.style.top = '-50px'
     el.style.left = '50%'
     el.style.width = '10px'
     el.style.height = '10px'

@@ -54,8 +54,6 @@ class ResizeHandler extends BaseHandler {
       return
     }
 
-    console.log(this.resizeHandlerType)
-
     e.preventDefault()
 
     const sizeValue = { ...this._lastSize }
@@ -98,7 +96,7 @@ class ResizeHandler extends BaseHandler {
         sizeValue.height += deltaY
       break;
     }
-    console.log(sizeValue)
+
     this.transform(sizeValue)
   }
 
