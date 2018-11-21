@@ -96,7 +96,7 @@ class ResizeHandler extends BaseHandler {
         sizeValue.height += deltaY
       break;
     }
-
+    
     this.transform(sizeValue)
   }
 
