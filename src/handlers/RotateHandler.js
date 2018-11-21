@@ -1,3 +1,5 @@
+import BaseHandler from './BaseHandler'
+
 class RotateHandler extends BaseHandler {
   constructor (el, transformerHelper) {
     super(el, transformerHelper)

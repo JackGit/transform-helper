@@ -16,6 +16,8 @@ const createRootElement = ({ zIndex }) => {
   el.style.display = 'block'
   el.style.background = 'rgba(255,0,0,.5)'
   el.style.zIndex = zIndex
+  el.style.width = '100px'
+  el.style.height = '100px'
   document.body.appendChild(el)
   return el
 }
@@ -69,7 +71,7 @@ class TransformHelper {
     const { zIndex, userTransform } = this.options
 
     this.rootEl = createRootElement({ zIndex })
-    this.transfomer = new Transformer(this.rootEl, { userTransform })
+    this.transformer = new Transformer(this.rootEl, { userTransform })
   }
 
   _invokeHelpers (method, ...args) {
