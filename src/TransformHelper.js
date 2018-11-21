@@ -22,35 +22,6 @@ const createRootElement = ({ zIndex }) => {
   return el
 }
 
-/**
- * helperConfigValue can be:
- *  String value as helper name, like 'move'
- *  Array as ['move', options]
- *  BaseHelper instance
- * @param {String|Array|BaseHelper} helperConfigValue 
- */
-const createHelperInstance = helperConfigValue => {
-  if (helperConfigValue instanceof BaseHelper) {
-    return helperConfigValue
-  } else {
-    let name, options
-    if (typeof helperConfigValue === 'string') {
-      name = helperConfigValue
-    } else if (Array.isArray(helperConfigValue)) {
-      name = helperConfigValue[0]
-      options = helperConfigValue[1] || undefined
-    }
-
-    const HelperClass = HelperClassMapping[name]
-    if (!HelperClass) {
-      console.warn(`cannot find helper class for ${name}`)
-      return
-    }
-
-    return new HelperClass(options)
-  }
-}
-
 const defaultOptions = {
   userTransform: false,
   zIndex: 100
@@ -74,12 +45,41 @@ class TransformHelper {
     this.transformer = new Transformer(this.rootEl, { userTransform })
   }
 
+  /**
+ * helperConfigValue can be:
+ *  String value as helper name, like 'move'
+ *  Array as ['move', options]
+ *  BaseHelper instance
+ * @param {String|Array|BaseHelper} helperConfigValue 
+ */
+  _createHelperInstance = (helperConfigValue) => {
+  if (helperConfigValue instanceof BaseHelper) {
+    return helperConfigValue
+  } else {
+    let name, options
+    if (typeof helperConfigValue === 'string') {
+      name = helperConfigValue
+    } else if (Array.isArray(helperConfigValue)) {
+      name = helperConfigValue[0]
+      options = helperConfigValue[1] || undefined
+    }
+
+    const HelperClass = HelperClassMapping[name]
+    if (!HelperClass) {
+      console.warn(`cannot find helper class for ${name}`)
+      return
+    }
+
+    return new HelperClass(this, options)
+  }
+}
+
   _invokeHelpers (method, ...args) {
     this.helpers.forEach(helper => helper[method](...args))
   }
 
   _createHelpers (helpers) {
-    this.helpers = helpers.map(createHelperInstance)
+    this.helpers = helpers.map(this._createHelperInstance)
     this._invokeHelpers('create')
   }
 
