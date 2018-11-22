@@ -59,32 +59,36 @@ class ResizeHandler extends BaseHandler {
     const sizeValue = { ...this._lastSize }
     const deltaX = e.clientX - this._startPos.x
     const deltaY = e.clientY - this._startPos.y
+    const bottom = sizeValue.top + sizeValue.height
+    const right = sizeValue.left + sizeValue.width
+    const newTop = sizeValue.top + deltaY
+    const newLeft = sizeValue.left + deltaX
 
     switch (this.resizeHandlerType) {
       case RESIZE_TYPES.TL:
-        sizeValue.top += deltaY
-        sizeValue.left += deltaX
+        sizeValue.top = Math.min(newTop, bottom)
+        sizeValue.left = Math.min(newLeft, right)
         sizeValue.width -= deltaX
         sizeValue.height -= deltaY
       break;
       case RESIZE_TYPES.TC:
-        sizeValue.top = Math.min(sizeValue.top + deltaY, sizeValue.top + sizeValue.height)
+        sizeValue.top = Math.min(newTop, bottom)
         sizeValue.height -= deltaY
       break;
       case RESIZE_TYPES.TR:
-        sizeValue.top += deltaY
+        sizeValue.top = Math.min(newTop, bottom)
         sizeValue.width += deltaX
         sizeValue.height -= deltaY
       break;
       case RESIZE_TYPES.LM:
-        sizeValue.left = Math.min(sizeValue.left + deltaX, sizeValue.left + sizeValue.width)
+        sizeValue.left = Math.min(newLeft, right)
         sizeValue.width -= deltaX
       break;
       case RESIZE_TYPES.RM:
         sizeValue.width += deltaX
       break;
       case RESIZE_TYPES.BL:
-        sizeValue.left += deltaX
+        sizeValue.left = Math.min(newLeft, right)
         sizeValue.width -= deltaX
         sizeValue.height += deltaY
       break;
