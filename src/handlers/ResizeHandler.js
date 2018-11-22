@@ -1,5 +1,12 @@
 import BaseHandler from './BaseHandler'
 
+const defaultOptions = {
+  boundary: null, // { top, left, width, height },
+  snapping: null, //{ x, y },
+  widthRange: [],
+  heightRange: []
+}
+
 const RESIZE_TYPES = {
   TL: 'top-left',
   TC: 'top-center',

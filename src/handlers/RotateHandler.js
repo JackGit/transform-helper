@@ -1,5 +1,10 @@
 import BaseHandler from './BaseHandler'
 
+const defaultOptions = {
+  rotationRange: [],
+  snapping: 1
+}
+
 class RotateHandler extends BaseHandler {
   constructor (el, transformHelper) {
     super(el, transformHelper)

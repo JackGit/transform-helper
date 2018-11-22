@@ -1,8 +1,15 @@
 import BaseHandler from './BaseHandler'
 
+const defaultOptions = {
+  boundary: null, // { top, left, width, height },
+  snapping: null, //{ x, y },
+  direction: 'vertical|horizontal'
+}
+
 class MoveHandler extends BaseHandler {
-  constructor (el, transformHelper) {
+  constructor (el, transformHelper, options) {
     super(el, transformHelper)
+    this.options = { ...defaultOptions, ...(options || {}) }
     this._started = false
     this._lastPos = { x: 0, y: 0 }
     this._startPos = { x: 0, y: 0 }
@@ -18,6 +25,9 @@ class MoveHandler extends BaseHandler {
   }
 
   onStart = e => {
+    e.preventDefault()
+    e.stopPropagation()
+
     const { top, left } = this.transformHelper.transformer.descriptor
     this._lastPos = { x: left, y: top }
     this._startPos = { x: e.clientX, y: e.clientY }
