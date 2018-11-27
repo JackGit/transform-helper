@@ -1,4 +1,5 @@
 import BaseHandler from './BaseHandler'
+import { clientPosition, startEvent, moveEvent, endEvent } from '../utils'
 
 const defaultOptions = {
   boundary: null, // { top, left, width, height },
@@ -17,11 +18,11 @@ class MoveHandler extends BaseHandler {
 
   bindEvents () {
     const { rootEl } = this.transformHelper
-    rootEl.addEventListener('mousedown', this.onStart)
+    rootEl.addEventListener(startEvent(), this.onStart)
   }
 
   unbindEvents () {
-    this.el.removeEventListener('mousedown', this.onStart)
+    this.el.removeEventListener(startEvent(), this.onStart)
   }
 
   onStart = e => {
@@ -30,12 +31,12 @@ class MoveHandler extends BaseHandler {
 
     const { top, left } = this.transformHelper.transformer.descriptor
     this._lastPos = { x: left, y: top }
-    this._startPos = { x: e.clientX, y: e.clientY }
+    this._startPos = clientPosition(e)
 
     this._started = true
 
-    window.addEventListener('mousemove', this.onMove)
-    window.addEventListener('mouseup', this.onEnd)
+    window.addEventListener(moveEvent(), this.onMove)
+    window.addEventListener(endEvent(), this.onEnd)
   }
 
   onMove = e => {
@@ -44,9 +45,10 @@ class MoveHandler extends BaseHandler {
     }
 
     e.stopPropagation()
+    const { x, y } = clientPosition(e)
 
-    const deltaX = e.clientX - this._startPos.x
-    const deltaY = e.clientY - this._startPos.y
+    const deltaX = x - this._startPos.x
+    const deltaY = y - this._startPos.y
     
     this.transform({
       x: this._lastPos.x + deltaX,
@@ -55,8 +57,8 @@ class MoveHandler extends BaseHandler {
   }
 
   onEnd = () => {
-    window.removeEventListener('mousemove', this.onMove)
-    window.removeEventListener('mouseup', this.onEnd)
+    window.removeEventListener(moveEvent(), this.onMove)
+    window.removeEventListener(endEvent(), this.onEnd)
 
     this._started = false
   }

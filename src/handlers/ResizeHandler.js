@@ -1,4 +1,5 @@
 import BaseHandler from './BaseHandler'
+import { clientPosition, startEvent, moveEvent, endEvent } from '../utils'
 
 const defaultOptions = {
   boundary: null, // { top, left, width, height },
@@ -35,11 +36,11 @@ class ResizeHandler extends BaseHandler {
   }
 
   bindEvents () {
-    this.el.addEventListener('mousedown', this.onStart)
+    this.el.addEventListener(startEvent(), this.onStart)
   }
 
   unbindEvents () {
-    this.el.removeEventListener('mousedown', this.onStart)
+    this.el.removeEventListener(startEvent(), this.onStart)
   }
 
   onStart = e => {
@@ -49,11 +50,11 @@ class ResizeHandler extends BaseHandler {
     const { top, left, width, height } = this.transformHelper.transformer.descriptor
     
     this._lastSize = { top, left, width, height }
-    this._startPos = { x: e.clientX, y: e.clientY }
+    this._startPos = clientPosition(e)
     this._started = true
     
-    window.addEventListener('mousemove', this.onMove)
-    window.addEventListener('mouseup', this.onEnd)
+    window.addEventListener(moveEvent(), this.onMove)
+    window.addEventListener(endEvent(), this.onEnd)
   }
 
   onMove = e => {
@@ -63,9 +64,10 @@ class ResizeHandler extends BaseHandler {
 
     e.preventDefault()
 
+    const { x, y } = clientPosition(e)
     const sizeValue = { ...this._lastSize }
-    const deltaX = e.clientX - this._startPos.x
-    const deltaY = e.clientY - this._startPos.y
+    const deltaX = x - this._startPos.x
+    const deltaY = y - this._startPos.y
     const bottom = sizeValue.top + sizeValue.height
     const right = sizeValue.left + sizeValue.width
     const newTop = sizeValue.top + deltaY
@@ -112,8 +114,8 @@ class ResizeHandler extends BaseHandler {
   }
 
   onEnd = () => {
-    window.removeEventListener('mousemove', this.onMove)
-    window.removeEventListener('mouseup', this.onEnd)
+    window.removeEventListener(moveEvent(), this.onMove)
+    window.removeEventListener(endEvent(), this.onEnd)
 
     this._started = false
   }

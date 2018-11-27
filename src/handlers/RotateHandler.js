@@ -1,4 +1,5 @@
 import BaseHandler from './BaseHandler'
+import { clientPosition, startEvent, moveEvent, endEvent } from '../utils'
 
 const defaultOptions = {
   rotationRange: [],
@@ -14,11 +15,11 @@ class RotateHandler extends BaseHandler {
   }
 
   bindEvents () {
-    this.el.addEventListener('mousedown', this.onStart)
+    this.el.addEventListener(startEvent(), this.onStart)
   }
 
   unbindEvents () {
-    this.el.removeEventListener('mousedown', this.onStart)
+    this.el.removeEventListener(startEvent(), this.onStart)
   }
 
   onStart = e => {
@@ -28,11 +29,11 @@ class RotateHandler extends BaseHandler {
     const { rotation } = this.transformHelper.transformer.descriptor
     
     this._lastRotation = rotation
-    this._startPos = { x: e.clientX, y: e.clientY }
+    this._startPos = clientPosition(e)
     this._started = true
 
-    window.addEventListener('mousemove', this.onMove)
-    window.addEventListener('mouseup', this.onEnd)
+    window.addEventListener(moveEvent(), this.onMove)
+    window.addEventListener(endEvent(), this.onEnd)
   }
 
   onMove = e => {
@@ -45,15 +46,15 @@ class RotateHandler extends BaseHandler {
     const deltaDegree = deg(
       this.transformHelper.transformer.pivotPoint(),
       this._startPos,
-      { x: e.clientX, y: e.clientY }
+      clientPosition(e)
     )
 
     this.transform(this._lastRotation + deltaDegree)
   }
 
   onEnd = () => {
-    window.removeEventListener('mousemove', this.onMove)
-    window.removeEventListener('mouseup', this.onEnd)
+    window.removeEventListener(moveEvent(), this.onMove)
+    window.removeEventListener(endEvent(), this.onEnd)
 
     this._started = false
   }
